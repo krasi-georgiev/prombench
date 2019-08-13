@@ -96,14 +96,17 @@ func main() {
 			envVars[tmp[0]] = tmp[1]
 		}
 
-		var buf bytes.Buffer
-		commentTemplate := template.Must(template.New("Comment").Parse(os.Getenv(*templateEnvVar)))
-		if err := commentTemplate.Execute(&buf, envVars); err != nil {
-			log.Fatalln(err)
-		}
+		templateText := os.Getenv(*templateEnvVar)
+		if templateText != "" {
+			var buf bytes.Buffer
+			commentTemplate := template.Must(template.New("Comment").Parse(templateText))
+			if err := commentTemplate.Execute(&buf, envVars); err != nil {
+				log.Fatalln(err)
+			}
 
-		if err := postComment(clt, owner, repo, prnumber, buf.String()); err != nil {
-			log.Fatalln(err)
+			if err := postComment(clt, owner, repo, prnumber, buf.String()); err != nil {
+				log.Fatalln(err)
+			}
 		}
 
 		// Setting benchmark label.
